@@ -33,6 +33,9 @@ architecture test of tb_traffic_light_controller is
     signal Ga, Ya, Ra : std_logic;
     signal Gb, Yb, Rb : std_logic;
 
+    -- Simulation Control Signal
+    signal sim_done : boolean := false;
+
     -- Clock period definition (10ns clock)
     constant clk_period : time := 10 ns;
 
@@ -52,13 +55,16 @@ begin
         Rb  => Rb
     );
 
-    -- Clock process
+    -- Clock process with clean exit condition
     clk_process : process
     begin
-        clk <= '0';
-        wait for clk_period/2;
-        clk <= '1';
-        wait for clk_period/2;
+        while not sim_done loop
+            clk <= '0';
+            wait for clk_period/2;
+            clk <= '1';
+            wait for clk_period/2;
+        end loop;
+        wait;
     end process;
 
     -- Stimulus process
@@ -84,7 +90,8 @@ begin
         Sb <= '1';
         wait for 80 ns;
 
-        -- End simulation
+        -- Stop simulation cleanly
+        sim_done <= true;
         wait;
     end process;
 
